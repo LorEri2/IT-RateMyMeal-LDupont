@@ -1,23 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react'; 
 import { StyleSheet, View, FlatList, Pressable, Text } from 'react-native';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import AfficherPlat from '../components/AfficherPlat';
-import { MEALS_DATA } from '../store/data';
+import { db } from '../store/database'; 
+
+
+type Meal = {
+  id: number; 
+  nom: string;
+  note: number;
+  image: string;
+};
 
 export default function Index() {
   const router = useRouter();
-  const [meals, setMeals] = useState(MEALS_DATA);
+  const [meals, setMeals] = useState<Meal[]>([]);
 
-
+  
   useFocusEffect(
-    React.useCallback(() => {
-      setMeals([...MEALS_DATA]);
+    useCallback(() => {
+     
+      const loadData = async () => {
+        try {
+          // SELECT : On récupère tout
+          const result = await db.getAllAsync<Meal>('SELECT * FROM meals');
+          setMeals(result);
+        } catch (error) {
+          console.error("Erreur de chargement:", error);
+        }
+      };
+
+      loadData();
     }, [])
   );
 
   return (
     <View style={styles.container}>
-
       <Pressable 
         style={styles.addButton} 
         onPress={() => router.push('/add')}
@@ -27,12 +45,10 @@ export default function Index() {
 
       <FlatList
         data={meals}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()} 
         renderItem={({ item }) => (
-
           <Link href={`/detail/${item.id}` as any} asChild>
             <Pressable>
-      
               <AfficherPlat 
                 nom={item.nom} 
                 note={item.note} 

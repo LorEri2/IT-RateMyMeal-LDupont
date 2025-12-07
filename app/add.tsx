@@ -2,25 +2,25 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import AddMealForm from '../components/AddMealForm';
-import { addMealToData } from '../store/data';
+import { db } from '../store/database'; 
 
 export default function AddMealScreen() {
   const router = useRouter();
 
-  const handleAddMeal = (name: string, rating: string) => {
-    
-    const newMeal = {
-      id: Math.random().toString(),
-      nom: name,
-      note: parseInt(rating),
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop'
-    };
+  const handleAddMeal = async (name: string, rating: string) => {
 
-   
-    addMealToData(newMeal);
-
-    
-    router.back();
+    const defaultImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop';
+ 
+    try {
+      await db.runAsync(
+        'INSERT INTO meals (nom, note, image) VALUES (?, ?, ?)', 
+        [name, parseInt(rating), defaultImage]
+      );
+      
+      router.back();
+    } catch (error) {
+      console.error("Erreur lors de l'ajout :", error);
+    }
   };
 
   return (
