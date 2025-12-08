@@ -2,19 +2,18 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import AddMealForm from '../components/AddMealForm';
-import { db } from '../store/database'; 
+import { db } from '../store/database';
 
 export default function AddMealScreen() {
   const router = useRouter();
 
-  const handleAddMeal = async (name: string, rating: string) => {
-
-    const defaultImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop';
- 
+  
+  const handleAddMeal = async (name: string, rating: string, imageUri: string) => {
     try {
+     
       await db.runAsync(
         'INSERT INTO meals (nom, note, image) VALUES (?, ?, ?)', 
-        [name, parseInt(rating), defaultImage]
+        [name, parseInt(rating), imageUri]
       );
       
       router.back();

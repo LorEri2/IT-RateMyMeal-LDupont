@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Pressable, Text } from 'react-native';
+import { StyleSheet, View, TextInput, Pressable, Text, ScrollView } from 'react-native';
+import ImageSelector from './ImageSelector'; 
 
 
 type AddMealFormProps = {
-  onAddMeal: (name: string, rating: string) => void;
+  onAddMeal: (name: string, rating: string, imageUri: string) => void;
 };
 
 const AddMealForm = ({ onAddMeal }: AddMealFormProps) => {
   const [mealName, setMealName] = useState('');
   const [rating, setRating] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); 
 
   const handleAddMeal = () => {
-
-    if (mealName.trim() === '' || rating.trim() === '') {
+ 
+    if (mealName.trim() === '' || rating.trim() === '' || !selectedImage) {
+      alert("Merci de remplir tous les champs et de prendre une photo !");
       return; 
     }
-    onAddMeal(mealName, rating);
 
+   
+    onAddMeal(mealName, rating, selectedImage);
+
+   
     setMealName('');
     setRating('');
+    setSelectedImage(null);
+  };
+
+ 
+  const imageTakenHandler = (imageUri: string) => {
+    setSelectedImage(imageUri);
   };
 
   return (
-    <View style={styles.formContainer}>
+    <ScrollView style={styles.formContainer}>
       <Text style={styles.label}>Ajouter un nouveau plat</Text>
       
       <TextInput
@@ -40,10 +52,12 @@ const AddMealForm = ({ onAddMeal }: AddMealFormProps) => {
         keyboardType="numeric"
       />
       
+    <ImageSelector onImageTaken={imageTakenHandler} />
+
       <Pressable style={styles.button} onPress={handleAddMeal}>
-        <Text style={styles.buttonText}>Ajouter à la liste</Text>
+        <Text style={styles.buttonText}>Sauvegarder le plat</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -56,32 +70,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
-  label: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
-  },
+  label: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: '#333' },
   input: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-    fontSize: 16,
+    backgroundColor: '#fff', borderWidth: 1, borderColor: '#ccc',
+    padding: 10, borderRadius: 5, marginBottom: 15, fontSize: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 5,
-    alignItems: 'center',
+    backgroundColor: '#007AFF', padding: 12, borderRadius: 5, alignItems: 'center', marginTop: 10
   },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });
 
 export default AddMealForm;
